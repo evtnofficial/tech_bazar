@@ -6,16 +6,48 @@ export async function POST(request) {
 	try {
 		await connectDb();
 		const reqBody = await request.json();
+		const {
+			name,
+			type,
+			price,
+			description,
+			age,
+			seller,
+			monetization,
+			earningsPerMonth,
+			images,
+		} = reqBody;
+
+		// Validate incoming data
+		if (
+			!name ||
+			!type ||
+			!price ||
+			!description ||
+			!age ||
+			!seller ||
+			!monetization ||
+			!earningsPerMonth ||
+			!images ||
+			!Array.isArray(images) ||
+			images.length === 0
+		) {
+			return NextResponse.json({
+				message: "Invalid input. All fields are required.",
+				status: 400,
+			});
+		}
 
 		const newProduct = new Product({
-			title: reqBody.name,
-			productType: reqBody.type,
-			price: reqBody.price,
-			description: reqBody.description,
-			age: reqBody.age,
-			monetization: reqBody.monetization,
-			earningPerMonth: reqBody.earningPerMonth,
-			images: reqBody.images, // Add this field
+			title: name,
+			type,
+			price,
+			description,
+			age,
+			seller,
+			monetization,
+			earningsPerMonth,
+			images,
 		});
 
 		const savedProduct = await newProduct.save();

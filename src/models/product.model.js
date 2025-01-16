@@ -17,7 +17,7 @@ const productModel = new mongoose.Schema(
 			type: Number,
 			required: true,
 		},
-		productType: {
+		type: {
 			type: String,
 			required: true,
 		},
@@ -25,7 +25,7 @@ const productModel = new mongoose.Schema(
 			type: String,
 			required: true,
 		},
-		earningPerMonth: {
+		earningsPerMonth: {
 			type: Number,
 			default: 0,
 		},

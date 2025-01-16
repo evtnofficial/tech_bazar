@@ -1,13 +1,37 @@
+"use client";
+
 import ProfileLayout from "@/components/profile-layout";
 import { Button } from "@/components/ui/button";
+import axios from "axios";
+import { useEffect, useState } from "react";
 
 export default function AdminProductsPage() {
+	const [isLoading, setIsLoading] = useState(false);
+
 	// In a real application, you would fetch the products from your backend
 	const products = [
 		{ id: "1", name: "Tech Blog", type: "Website", price: 5000 },
 		{ id: "2", name: "E-commerce Store", type: "Website", price: 10000 },
 		{ id: "3", name: "YouTube Channel", type: "YouTube", price: 7500 },
 	];
+
+	const getAllProducts = async () => {
+		try {
+			setIsLoading(true);
+			const response = await axios.get("/api/admin/allproducts");
+
+			console.log("Product loaded successfully:", response.data);
+			setIsLoading(false);
+		} catch (error) {
+			console.log(error);
+		} finally {
+			setIsLoading(false);
+		}
+	};
+
+	useEffect(() => {
+		getAllProducts();
+	}, []);
 
 	return (
 		<ProfileLayout isAdmin={true}>

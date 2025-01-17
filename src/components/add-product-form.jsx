@@ -186,14 +186,20 @@ export default function AddProductPage() {
 							</SelectTrigger>
 							<SelectContent>
 								<SelectItem value='website'>Website</SelectItem>
-								<SelectItem value='facebook'>
+								<SelectItem value='facebook page'>
 									Facebook Page
 								</SelectItem>
-								<SelectItem value='instagram'>
+								<SelectItem value='instagram account'>
 									Instagram Account
 								</SelectItem>
-								<SelectItem value='youtube'>
+								<SelectItem value='youtube channel'>
 									YouTube Channel
+								</SelectItem>
+								<SelectItem value='google play console'>
+									Google Play Console
+								</SelectItem>
+								<SelectItem value='adsense dashboard'>
+									Adsense Dashboard
 								</SelectItem>
 							</SelectContent>
 						</Select>

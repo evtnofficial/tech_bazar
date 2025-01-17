@@ -29,7 +29,7 @@ export default function Hero() {
 							size='lg'
 							variant='outline'
 							className='bg-transparent text-white border-white hover:bg-white/10'>
-							<Link href='/sell'>
+							<Link href='https://wa.link/d7vcm6'>
 								Start Selling
 								<ArrowRight className='ml-2 h-5 w-5' />
 							</Link>

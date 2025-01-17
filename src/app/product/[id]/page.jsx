@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { notFound } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
@@ -20,16 +20,38 @@ import {
 	CardTitle,
 } from "@/components/ui/card";
 import { products } from "@/lib/products";
+import axios from "axios";
 
 export default function ProductDetailsPage({ params: rawParams }) {
-	// Unwrap the params
-	const params = React.use(rawParams);
-
-	const product = products?.find((p) => p?.id === params?.id);
+	const [product, setProduct] = useState([]);
+	const [isLoading, setIsLoading] = useState(false);
+	const productId = React.use(rawParams).id;
 
 	if (!product) {
 		notFound();
 	}
+
+	const getProduct = async () => {
+		try {
+			setIsLoading(true);
+			const response = await axios.post("/api/get-product", {
+				productId,
+			});
+			console.log(response);
+
+			setProduct(response.data?.product);
+
+			setIsLoading(false);
+		} catch (error) {
+			console.log(error);
+		} finally {
+			setIsLoading(false);
+		}
+	};
+
+	useEffect(() => {
+		getProduct();
+	}, []);
 
 	const [selectedImage, setSelectedImage] = useState(0);
 
@@ -47,8 +69,10 @@ export default function ProductDetailsPage({ params: rawParams }) {
 					<Card className='overflow-hidden mb-4'>
 						<CardHeader className='p-0'>
 							<Image
-								src={product?.images[selectedImage]}
-								alt={`${product?.name} - Image ${
+								src={
+									"https://www.thoughtco.com/thmb/q17Qe08HCrtbdTFVyo8e1j_Qj4E=/1500x0/filters:no_upscale():max_bytes(150000):strip_icc()/wordpress-5be6252ac9e77c00524ca43d.jpg"
+								}
+								alt={`${product?.title} - Image ${
 									selectedImage + 1
 								}`}
 								width={600}
@@ -58,7 +82,7 @@ export default function ProductDetailsPage({ params: rawParams }) {
 						</CardHeader>
 					</Card>
 					<div className='grid grid-cols-4 gap-2'>
-						{product.images?.map((image, index) => (
+						{product?.images?.map((image, index) => (
 							<button
 								key={index}
 								onClick={() => setSelectedImage(index)}
@@ -69,7 +93,7 @@ export default function ProductDetailsPage({ params: rawParams }) {
 								}`}>
 								<Image
 									src={image}
-									alt={`${product.name} - Thumbnail ${
+									alt={`${product.title} - Thumbnail ${
 										index + 1
 									}`}
 									width={150}
@@ -85,16 +109,16 @@ export default function ProductDetailsPage({ params: rawParams }) {
 					<Card>
 						<CardHeader>
 							<CardTitle className='text-3xl font-bold'>
-								{product.name}
+								{product.title}
 							</CardTitle>
 							<div className='flex items-center justify-between mt-2'>
 								<div className='text-2xl font-semibold text-primary'>
-									${product.price.toLocaleString()}
+									${product.price?.toLocaleString()}
 								</div>
 								<div className='text-sm text-gray-500'>
 									Category:{" "}
-									{product.type.charAt(0).toUpperCase() +
-										product.type.slice(1)}
+									{product.type?.charAt(0).toUpperCase() +
+										product.type?.slice(1)}
 								</div>
 							</div>
 						</CardHeader>
@@ -114,7 +138,7 @@ export default function ProductDetailsPage({ params: rawParams }) {
 								<li className='flex items-center'>
 									<TrendingUp className='mr-2 h-5 w-5 text-gray-400' />
 									Monthly Earnings: $
-									{product.earningsPerMonth.toLocaleString()}
+									{product?.earningsPerMonth?.toLocaleString()}
 								</li>
 								<li>
 									<span className='font-semibold'>
@@ -123,13 +147,10 @@ export default function ProductDetailsPage({ params: rawParams }) {
 									{product.monetization}
 								</li>
 								<li>
-									<span className='font-semibold'>ROI:</span>{" "}
-									{(
-										((product.earningsPerMonth * 12) /
-											product.price) *
-										100
-									).toFixed(2)}
-									% annually
+									<span className='font-semibold'>
+										Earning Per Month:
+									</span>{" "}
+									$ {product.earningsPerMonth}
 								</li>
 								<li>
 									<span className='font-semibold'>
@@ -147,20 +168,18 @@ export default function ProductDetailsPage({ params: rawParams }) {
 							</h3>
 							<div className='bg-gray-50 p-4 rounded-lg'>
 								<p className='font-semibold'>
-									{product?.seller?.name}
+									{product?.seller?.username}
 								</p>
 								<div className='flex items-center mt-1'>
-									<Star className='h-4 w-4 text-yellow-400 mr-1' />
 									<span>
-										{product?.seller?.rating.toFixed(1)} (
-										{product?.seller?.totalSales} sales)
+										({product?.seller?.totalSales} sales)
 									</span>
 								</div>
 								<p className='text-sm text-gray-500 mt-1'>
-									Member since{"01-01-2025 "}
-									{/* {new Date(
-										product?.seller?.memberSince
-									).toLocaleDateString()} */}
+									Member since{" "}
+									{new Date(
+										product?.seller?.createdAt
+									)?.toDateString()}
 								</p>
 							</div>
 						</CardContent>

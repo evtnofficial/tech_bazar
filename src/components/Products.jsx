@@ -1,9 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { Product, products } from "@/lib/products";
 import { Button } from "@/components/ui/button";
 import {
 	Select,
@@ -20,8 +19,11 @@ import {
 	CardFooter,
 	CardHeader,
 } from "@/components/ui/card";
+import axios from "axios";
 
 export default function ProductSection() {
+	const [products, setProducts] = useState([]);
+	const [isLoading, setIsLoading] = useState(false);
 	const [categoryFilter, setCategoryFilter] = useState("all");
 	const [priceFilter, setPriceFilter] = useState("");
 	const [visibleProducts, setVisibleProducts] = useState(5);
@@ -35,6 +37,24 @@ export default function ProductSection() {
 	const handleLoadMore = () => {
 		setVisibleProducts((prev) => prev + 5);
 	};
+
+	const getAllProducts = async () => {
+		try {
+			setIsLoading(true);
+			const response = await axios.get("/api/admin/allproducts");
+			setProducts(response.data?.products);
+
+			setIsLoading(false);
+		} catch (error) {
+			console.log(error);
+		} finally {
+			setIsLoading(false);
+		}
+	};
+
+	useEffect(() => {
+		getAllProducts();
+	}, []);
 
 	return (
 		<section className='py-16 bg-gray-50'>
@@ -95,7 +115,7 @@ export default function ProductSection() {
 						.slice(0, visibleProducts)
 						.map((product) => (
 							<ProductListItem
-								key={product.id}
+								key={product._id}
 								product={product}
 							/>
 						))}
@@ -120,7 +140,7 @@ function ProductListItem({ product }) {
 				<CardHeader className='md:w-1/4'>
 					<Image
 						src={`${product?.images[0]}`}
-						alt={product.name}
+						alt={product.title}
 						width={300}
 						height={200}
 						className='w-full h-48 object-cover rounded-t-lg md:rounded-l-lg md:rounded-t-none'
@@ -163,7 +183,7 @@ function ProductListItem({ product }) {
 						</p>
 					</div>
 					<Button asChild className='w-full mt-4'>
-						<Link href={`/product/${product.id}`}>
+						<Link href={`/product/${product._id}`}>
 							View Details
 						</Link>
 					</Button>

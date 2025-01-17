@@ -1,3 +1,4 @@
+"use client";
 import React, { useContext } from "react";
 import { AuthContext } from "../../../../context/authContext";
 import Link from "next/link";
@@ -13,7 +14,7 @@ import {
 } from "@/components/ui/table";
 
 export default function UserOrdersPage() {
-	// const { user } = useContext(AuthContext);
+	const { user } = useContext(AuthContext);
 
 	const orders = [
 		{
@@ -33,7 +34,7 @@ export default function UserOrdersPage() {
 	];
 
 	return (
-		<ProfileLayout isAdmin={false}>
+		<ProfileLayout isAdmin={user?.role === "admin"}>
 			<h1 className='text-2xl font-bold mb-4'>Your Orders</h1>
 			<div className='bg-white shadow rounded-lg overflow-hidden'>
 				<Table>

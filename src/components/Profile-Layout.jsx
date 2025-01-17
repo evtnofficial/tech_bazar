@@ -2,6 +2,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
+import { LayoutDashboard } from "lucide-react";
 
 export default function ProfileLayout({ children, isAdmin }) {
 	const router = useRouter();
@@ -19,6 +20,18 @@ export default function ProfileLayout({ children, isAdmin }) {
 					<nav className='space-y-2'>
 						{isAdmin && (
 							<>
+								<Button
+									asChild
+									variant='ghost'
+									className='w-full justify-start'>
+									<Link href='/admin/dashboard'>
+										<LayoutDashboard className='mr-2 h-4 w-4' />
+										Dashboard
+										<span className='text-xs font-semibold bg-yellow-200 text-yellow-800 px-1 py-0.5 rounded'>
+											Admin
+										</span>
+									</Link>
+								</Button>
 								<Button
 									asChild
 									variant='ghost'

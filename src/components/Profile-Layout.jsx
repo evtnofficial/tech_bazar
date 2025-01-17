@@ -3,14 +3,30 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { LayoutDashboard } from "lucide-react";
+import { useContext } from "react";
+import { AuthContext } from "../../context/authContext";
+import axios from "axios";
+import toast from "react-hot-toast";
 
 export default function ProfileLayout({ children, isAdmin }) {
 	const router = useRouter();
+	const { user, setUser } = useContext(AuthContext);
 
-	const handleLogout = () => {
-		// Implement logout logic here
-		console.log("Logging out...");
-		router.push("/");
+	const handleLogout = async () => {
+		try {
+			const response = await axios.get("/api/auth/logout");
+			if (response.status === 200) {
+				localStorage.removeItem("user");
+				toast.success("Logout Successfully");
+				setUser(null);
+				router.push("/login");
+			} else {
+				toast.error("Failed to logout");
+			}
+		} catch (error) {
+			toast.error("An error occurred during logout");
+			console.log(error);
+		}
 	};
 
 	return (

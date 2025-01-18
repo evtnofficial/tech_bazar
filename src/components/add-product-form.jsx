@@ -27,7 +27,9 @@ export default function AddProductPage() {
 		description: "",
 		age: "",
 		monetization: "",
+		country: "",
 		earningsPerMonth: "",
+		traffic: "",
 	});
 	const [imageLinks, setImageLinks] = useState([""]);
 	const [errors, setErrors] = useState({
@@ -37,7 +39,9 @@ export default function AddProductPage() {
 		description: "",
 		age: "",
 		monetization: "",
+		country: "",
 		earningsPerMonth: "",
+		traffic: "",
 		images: "",
 		general: "",
 	});
@@ -107,12 +111,26 @@ export default function AddProductPage() {
 			isValid = false;
 		}
 
+		if (formData.country.length < 3) {
+			newErrors.country = "Please enter valid country name.";
+			isValid = false;
+		}
+
 		if (
 			!formData.earningsPerMonth ||
 			isNaN(Number(formData.earningsPerMonth)) ||
 			Number(formData.earningsPerMonth) < 0
 		) {
 			newErrors.earningsPerMonth = "Please enter valid monthly earnings.";
+			isValid = false;
+		}
+
+		if (
+			!formData.traffic ||
+			isNaN(Number(formData.traffic)) ||
+			Number(formData.traffic) < 0
+		) {
+			newErrors.traffic = "Please enter valid monthly traffic/reach.";
 			isValid = false;
 		}
 
@@ -280,6 +298,22 @@ export default function AddProductPage() {
 					</div>
 
 					<div>
+						<Label htmlFor='country'>Country</Label>
+						<Input
+							id='country'
+							name='country'
+							value={formData.country}
+							onChange={handleInputChange}
+							placeholder='e.g., India, USA'
+						/>
+						{errors.country && (
+							<p className='text-sm text-red-500 mt-1'>
+								{errors.country}
+							</p>
+						)}
+					</div>
+
+					<div>
 						<Label htmlFor='earningsPerMonth'>
 							Monthly Earnings ($)
 						</Label>
@@ -294,6 +328,23 @@ export default function AddProductPage() {
 						{errors.earningsPerMonth && (
 							<p className='text-sm text-red-500 mt-1'>
 								{errors.earningsPerMonth}
+							</p>
+						)}
+					</div>
+
+					<div>
+						<Label htmlFor='traffic'>Monthly Traffic/Reach</Label>
+						<Input
+							id='traffic'
+							name='traffic'
+							type='number'
+							value={formData.traffic}
+							onChange={handleInputChange}
+							placeholder='e.g., 1000'
+						/>
+						{errors.traffic && (
+							<p className='text-sm text-red-500 mt-1'>
+								{errors.traffic}
 							</p>
 						)}
 					</div>

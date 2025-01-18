@@ -20,9 +20,11 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from "@/components/ui/select";
-import { products } from "@/lib/products";
+import axios from "axios";
 
 export default function ShopPage() {
+	const [isLoading, setIsLoading] = useState(false);
+	const [products, setProducts] = useState([]);
 	const searchParams = useSearchParams();
 	const initialQuery = searchParams.get("q") || "";
 	const [searchQuery, setSearchQuery] = useState(initialQuery);
@@ -32,19 +34,41 @@ export default function ShopPage() {
 	const [currentPage, setCurrentPage] = useState(1);
 	const productsPerPage = 6;
 
+	const getAllProducts = async () => {
+		try {
+			setIsLoading(true);
+			const response = await axios.get("/api/admin/allproducts");
+			setProducts(response.data?.products);
+
+			setIsLoading(false);
+		} catch (error) {
+			console.log(error);
+		} finally {
+			setIsLoading(false);
+		}
+	};
 	useEffect(() => {
-		const filtered = products.filter(
-			(product) =>
-				(searchQuery === "" ||
-					product.name
-						.toLowerCase()
-						.includes(searchQuery.toLowerCase())) &&
-				(categoryFilter === "all" || product.type === categoryFilter) &&
-				(priceFilter === "" || product.price <= priceFilter)
-		);
+		getAllProducts();
+	}, []);
+
+	useEffect(() => {
+		const filtered = products.filter((product) => {
+			const matchesSearch =
+				searchQuery === "" ||
+				product?.title
+					?.toLowerCase()
+					.includes(searchQuery.toLowerCase());
+			const matchesCategory =
+				categoryFilter === "all" || product.type === categoryFilter;
+			const matchesPrice =
+				priceFilter === "" || product.price <= Number(priceFilter);
+
+			return matchesSearch && matchesCategory && matchesPrice;
+		});
+
 		setFilteredProducts(filtered);
 		setCurrentPage(1);
-	}, [searchQuery, categoryFilter, priceFilter]);
+	}, [searchQuery, categoryFilter, priceFilter, products]);
 
 	const indexOfLastProduct = currentPage * productsPerPage;
 	const indexOfFirstProduct = indexOfLastProduct - productsPerPage;
@@ -101,11 +125,11 @@ export default function ShopPage() {
 			) : (
 				<div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6'>
 					{currentProducts.map((product) => (
-						<Card key={product.id} className='flex flex-col'>
+						<Card key={product._id} className='flex flex-col'>
 							<CardHeader>
 								<Image
 									src={product.images[0]}
-									alt={product.name}
+									alt={product.title}
 									width={300}
 									height={200}
 									className='w-full h-48 object-cover rounded-t-lg'
@@ -113,7 +137,7 @@ export default function ShopPage() {
 							</CardHeader>
 							<CardContent className='flex-grow'>
 								<CardTitle className='mb-2'>
-									{product.name}
+									{product.title}
 								</CardTitle>
 								<p className='text-sm text-gray-600 mb-2'>
 									{product.description}

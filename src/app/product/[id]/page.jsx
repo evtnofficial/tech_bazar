@@ -19,7 +19,6 @@ import {
 	CardHeader,
 	CardTitle,
 } from "@/components/ui/card";
-import { products } from "@/lib/products";
 import axios from "axios";
 
 export default function ProductDetailsPage({ params: rawParams }) {
@@ -37,10 +36,7 @@ export default function ProductDetailsPage({ params: rawParams }) {
 			const response = await axios.post("/api/get-product", {
 				productId,
 			});
-			console.log(response);
-
 			setProduct(response.data?.product);
-
 			setIsLoading(false);
 		} catch (error) {
 			console.log(error);
@@ -148,18 +144,15 @@ export default function ProductDetailsPage({ params: rawParams }) {
 								</li>
 								<li>
 									<span className='font-semibold'>
-										Earning Per Month:
+										Traffic/Reach:
 									</span>{" "}
-									$ {product.earningsPerMonth}
+									{product?.traffic || 0} /Month
 								</li>
 								<li>
 									<span className='font-semibold'>
-										Payback Period:
+										Country:
 									</span>{" "}
-									{(
-										product.price / product.earningsPerMonth
-									).toFixed(1)}{" "}
-									months
+									{product?.country}
 								</li>
 							</ul>
 
@@ -184,7 +177,7 @@ export default function ProductDetailsPage({ params: rawParams }) {
 							</div>
 						</CardContent>
 						<CardFooter className='flex flex-col sm:flex-row justify-between items-center gap-4'>
-							<Link href='/checkout'>
+							<Link href={`/checkout/${product?._id}`}>
 								<Button size='lg' className='w-full sm:w-auto'>
 									Purchase Now
 								</Button>

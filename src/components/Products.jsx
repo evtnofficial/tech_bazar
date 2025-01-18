@@ -148,9 +148,9 @@ function ProductListItem({ product }) {
 				</CardHeader>
 				<CardContent className='flex-1 p-6'>
 					<Link
-						href={`/product/${product.id}`}
+						href={`/product/${product._id}`}
 						className='text-2xl font-semibold hover:underline mb-2 block'>
-						{product.name}
+						{product.title}
 					</Link>
 					<p className='text-gray-600 mb-4'>{product.description}</p>
 					<div className='grid grid-cols-2 gap-4'>

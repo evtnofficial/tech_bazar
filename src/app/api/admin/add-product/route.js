@@ -14,7 +14,9 @@ export async function POST(request) {
 			age,
 			seller,
 			monetization,
+			country,
 			earningsPerMonth,
+			traffic,
 			images,
 		} = reqBody;
 
@@ -27,7 +29,9 @@ export async function POST(request) {
 			!age ||
 			!seller ||
 			!monetization ||
+			!country ||
 			!earningsPerMonth ||
+			!traffic ||
 			!images ||
 			!Array.isArray(images) ||
 			images.length === 0
@@ -46,7 +50,9 @@ export async function POST(request) {
 			age,
 			seller,
 			monetization,
+			country,
 			earningsPerMonth,
+			traffic,
 			images,
 		});
 

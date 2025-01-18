@@ -26,7 +26,15 @@ const productModel = new mongoose.Schema(
 			type: String,
 			required: true,
 		},
+		country: {
+			type: String,
+			required: true,
+		},
 		earningsPerMonth: {
+			type: Number,
+			default: 0,
+		},
+		traffic: {
 			type: Number,
 			default: 0,
 		},

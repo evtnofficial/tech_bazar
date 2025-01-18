@@ -1,26 +1,32 @@
+import { NextResponse } from "next/server";
 import { connectDb } from "@/dbconfig/db";
 import { Order } from "@/models/order.model";
-import { NextResponse } from "next/server";
 
-export const revalidate = 0;
-
-export async function GET() {
+export async function POST(request) {
 	try {
 		await connectDb();
-		const orders = await Order.find()
+		const reqBody = await request.json();
+		const { orderId } = reqBody;
+
+		const order = await Order.findOne({ _id: orderId })
 			.populate({
 				path: "user",
 				select: "username email phone role createdAt",
 			})
 			.populate({
 				path: "product",
-			})
-			.lean();
+			});
+		if (!order) {
+			return NextResponse.json(
+				{ message: "Order Not Found!" },
+				{ status: 400 }
+			);
+		}
 
 		return NextResponse.json({
-			message: "Orders Found",
+			message: "Order found Successfully",
 			success: true,
-			orders,
+			order,
 		});
 	} catch (error) {
 		console.log(error);

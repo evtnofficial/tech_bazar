@@ -1,3 +1,4 @@
+"use client";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import {
@@ -9,17 +10,33 @@ import {
 	CardTitle,
 } from "@/components/ui/card";
 import { CheckCircle, ShoppingBag, Mail, ArrowRight } from "lucide-react";
+import axios from "axios";
+import React, { useEffect, useState } from "react";
 
-export default function ThankYouPage() {
-	// In a real application, you would fetch the order details from your backend
-	const order = {
-		id: "ORD-1234567",
-		total: 15000,
-		items: [
-			{ name: "Tech Blog", price: 5000 },
-			{ name: "E-commerce Store", price: 10000 },
-		],
+export default function ThankYouPage({ params: rawParams }) {
+	const [isLoading, setIsLoading] = useState(false);
+	const [order, setOrder] = useState([]);
+	const orderId = React.use(rawParams).id;
+
+	const getOrder = async () => {
+		try {
+			setIsLoading(true);
+			const response = await axios.post("/api/get-order", {
+				orderId,
+			});
+			setOrder(response.data?.order);
+			setIsLoading(false);
+		} catch (error) {
+			console.log(error);
+		} finally {
+			setIsLoading(false);
+		}
 	};
+
+	useEffect(() => {
+		getOrder();
+	}, []);
+
 
 	return (
 		<div className='container mx-auto px-4 py-16'>
@@ -36,22 +53,20 @@ export default function ThankYouPage() {
 				<Card className='mb-8'>
 					<CardHeader>
 						<CardTitle>Order Summary</CardTitle>
-						<CardDescription>Order ID: {order.id}</CardDescription>
+						<CardDescription>Order ID: {order._id}</CardDescription>
 					</CardHeader>
 					<CardContent>
 						<ul className='space-y-2'>
-							{order.items.map((item, index) => (
-								<li
-									key={index}
-									className='flex justify-between'>
-									<span>{item.name}</span>
-									<span>${item.price.toLocaleString()}</span>
-								</li>
-							))}
+							<li className='flex justify-between'>
+								<span>{order?.product?.title}</span>
+								<span>
+									${order?.product?.price?.toLocaleString()}
+								</span>
+							</li>
 						</ul>
 						<div className='mt-4 pt-4 border-t border-gray-200 flex justify-between font-bold'>
 							<span>Total</span>
-							<span>${order.total.toLocaleString()}</span>
+							<span>${order?.amount?.toLocaleString()}</span>
 						</div>
 					</CardContent>
 				</Card>

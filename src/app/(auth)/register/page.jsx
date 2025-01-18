@@ -14,12 +14,14 @@ export default function RegisterPage() {
 	const [formData, setFormData] = useState({
 		username: "",
 		email: "",
+		phone: "",
 		password: "",
 		confirmPassword: "",
 	});
 	const [errors, setErrors] = useState({
 		username: "",
 		email: "",
+		phone: "",
 		password: "",
 		confirmPassword: "",
 	});
@@ -45,6 +47,10 @@ export default function RegisterPage() {
 			isValid = false;
 		}
 
+		if (formData.phone.length < 8) {
+			newErrors.phone = "Phone No. is Required.";
+			isValid = false;
+		}
 		if (formData.password.length < 8) {
 			newErrors.password = "Password must be at least 8 characters.";
 			isValid = false;
@@ -72,7 +78,7 @@ export default function RegisterPage() {
 					toast.success(res.data.message);
 					setIsLoading(false);
 					// Redirect to home page after successful registration
-					router.push("/");
+					router.push("/login");
 				}
 			}
 		} catch (error) {
@@ -117,6 +123,22 @@ export default function RegisterPage() {
 						{errors.email && (
 							<p className='text-sm text-red-500 mt-1'>
 								{errors.email}
+							</p>
+						)}
+					</div>
+					<div>
+						<Label htmlFor='phone'>Phone</Label>
+						<Input
+							id='phone'
+							name='phone'
+							type='text'
+							placeholder='+91 1234567890'
+							value={formData.phone}
+							onChange={handleInputChange}
+						/>
+						{errors.phone && (
+							<p className='text-sm text-red-500 mt-1'>
+								{errors.phone}
 							</p>
 						)}
 					</div>

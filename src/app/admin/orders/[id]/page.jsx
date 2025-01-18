@@ -1,7 +1,7 @@
 "use client";
 
-import { use, useState } from "react";
-import { useRouter, useParams } from "next/navigation";
+import React, { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import {
 	Card,
@@ -26,40 +26,56 @@ import {
 	TableHeader,
 	TableRow,
 } from "@/components/ui/table";
-import { Package, User, Calendar, DollarSign } from "lucide-react";
+import { Package, User, Calendar, DollarSign, TrendingUp } from "lucide-react";
 import toast from "react-hot-toast";
+import axios from "axios";
 
-// In a real application, you would fetch this data from your API
-const getOrderDetails = (id) => {
-	return {
-		id: id,
-		status: "Processing",
-		date: "2023-05-15",
-		total: 15000,
-		customer: {
-			name: "John Doe",
-			email: "john@example.com",
-		},
-		items: [
-			{ id: "1", name: "Tech Blog", price: 5000 },
-			{ id: "2", name: "E-commerce Store", price: 10000 },
-		],
-	};
-};
-
-export default function AdminOrderDetailsPage() {
+export default function AdminOrderDetailsPage({ params: rawParams }) {
 	const router = useRouter();
-	const params = useParams(); // Unwrap params
-	const [order, setOrder] = useState(getOrderDetails(params.id));
+	const [order, setOrder] = useState({});
+	const [isLoading, setIsLoading] = useState(false);
+	const orderId = React.use(rawParams).id;
 
-	const handleStatusChange = async (newStatus) => {
-		// In a real application, you would update the status via an API call
-		setOrder({ ...order, status: newStatus });
+	const getOrder = async () => {
+		try {
+			setIsLoading(true);
+			const response = await axios.post("/api/get-order", {
+				orderId,
+			});
+			setOrder(response.data?.order);
+			setIsLoading(false);
+		} catch (error) {
+			console.log(error);
+		} finally {
+			setIsLoading(false);
+		}
+	};
 
-		// Simulating an API call
-		await new Promise((resolve) => setTimeout(resolve, 1000));
+	useEffect(() => {
+		getOrder();
+	}, []);
 
-		toast.success("Order status updated");
+	const handleStatusChange = async (status) => {
+		const payload = {
+			orderId,
+			status,
+		};
+		try {
+			setIsLoading(true);
+			const response = await axios.put(
+				"/api/admin/update-order",
+				payload
+			);
+			if (response?.data?.success) {
+				toast.success(response?.data?.message);
+				getOrder();
+			}
+			setIsLoading(false);
+		} catch (error) {
+			setIsLoading(false);
+			toast.error(error?.data?.message);
+			console.log(error);
+		}
 	};
 
 	return (
@@ -80,28 +96,37 @@ export default function AdminOrderDetailsPage() {
 							<Package className='mr-2' />
 							Order Information
 						</CardTitle>
-						<CardDescription>Order ID: {order.id}</CardDescription>
+						<CardDescription>
+							Order ID: {order?._id}
+						</CardDescription>
 					</CardHeader>
 					<CardContent>
 						<div className='space-y-2'>
 							<div className='flex items-center'>
 								<Calendar className='mr-2' />
-								<span>Date: {order.date}</span>
+								<span>
+									Date:{" "}
+									{new Date(order?.createdAt).toDateString()}
+								</span>
 							</div>
 							<div className='flex items-center'>
 								<DollarSign className='mr-2' />
 								<span>
-									Total: ${order.total.toLocaleString()}
+									Total: ${order?.amount?.toLocaleString()}
 								</span>
+							</div>
+							<div className='flex items-center'>
+								<TrendingUp className='mr-2' />
+								<span>Status: {order?.status}</span>
 							</div>
 						</div>
 					</CardContent>
 					<CardFooter>
 						<div className='flex items-center space-x-2'>
-							<span>Status:</span>
+							<span>Update Status:</span>
 							<Select
 								onValueChange={handleStatusChange}
-								defaultValue={order.status}>
+								defaultValue={order?.status}>
 								<SelectTrigger className='w-[180px]'>
 									<SelectValue placeholder='Select status' />
 								</SelectTrigger>
@@ -109,11 +134,11 @@ export default function AdminOrderDetailsPage() {
 									<SelectItem value='Processing'>
 										Processing
 									</SelectItem>
-									<SelectItem value='Shipped'>
-										Shipped
+									<SelectItem value='Failed'>
+										Failed
 									</SelectItem>
-									<SelectItem value='Delivered'>
-										Delivered
+									<SelectItem value='Completed'>
+										Completed
 									</SelectItem>
 									<SelectItem value='Cancelled'>
 										Cancelled
@@ -134,10 +159,13 @@ export default function AdminOrderDetailsPage() {
 					<CardContent>
 						<div className='space-y-2'>
 							<p>
-								<strong>Name:</strong> {order.customer.name}
+								<strong>Name:</strong> {order?.user?.username}
 							</p>
 							<p>
-								<strong>Email:</strong> {order.customer.email}
+								<strong>Email:</strong> {order?.user?.email}
+							</p>
+							<p>
+								<strong>Phone:</strong> {order?.user?.phone}
 							</p>
 						</div>
 					</CardContent>
@@ -159,20 +187,18 @@ export default function AdminOrderDetailsPage() {
 							</TableRow>
 						</TableHeader>
 						<TableBody>
-							{order.items.map((item) => (
-								<TableRow key={item.id}>
-									<TableCell>{item.name}</TableCell>
-									<TableCell className='text-right'>
-										${item.price.toLocaleString()}
-									</TableCell>
-								</TableRow>
-							))}
+							<TableRow>
+								<TableCell>{order?.product?.title}</TableCell>
+								<TableCell className='text-right'>
+									${order?.product?.price?.toLocaleString()}
+								</TableCell>
+							</TableRow>
 						</TableBody>
 					</Table>
 				</CardContent>
 				<CardFooter className='flex justify-end'>
 					<p className='font-bold'>
-						Total: ${order.total.toLocaleString()}
+						Total: ${order?.amount?.toLocaleString()}
 					</p>
 				</CardFooter>
 			</Card>

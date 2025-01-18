@@ -1,3 +1,4 @@
+"use client";
 import Link from "next/link";
 import ProfileLayout from "@/components/profile-layout";
 import { Button } from "@/components/ui/button";
@@ -9,35 +10,27 @@ import {
 	TableHeader,
 	TableRow,
 } from "@/components/ui/table";
+import { useEffect, useState } from "react";
+import axios from "axios";
 
 export default function AdminOrdersPage() {
-	// In a real application, you would fetch the orders from your backend
-	const orders = [
-		{
-			id: "1",
-			user: "John Doe",
-			product: "Tech Blog",
-			date: "2023-05-01",
-			status: "Completed",
-			total: 5000,
-		},
-		{
-			id: "2",
-			user: "Jane Smith",
-			product: "E-commerce Store",
-			date: "2023-05-15",
-			status: "Processing",
-			total: 10000,
-		},
-		{
-			id: "3",
-			user: "Bob Johnson",
-			product: "YouTube Channel",
-			date: "2023-05-20",
-			status: "Pending",
-			total: 7500,
-		},
-	];
+	const [orders, setOrders] = useState([]);
+	const [isLoading, setIsLoading] = useState(false);
+
+	const getOrders = async () => {
+		try {
+			setIsLoading(true);
+			const response = await axios.get("/api/admin/allorders");
+			setOrders(response.data?.orders || []);
+			setIsLoading(false);
+		} catch (error) {
+			setIsLoading(false);
+			console.log(error);
+		}
+	};
+	useEffect(() => {
+		getOrders();
+	}, []);
 
 	return (
 		<ProfileLayout isAdmin={true}>
@@ -56,20 +49,22 @@ export default function AdminOrdersPage() {
 						</TableRow>
 					</TableHeader>
 					<TableBody>
-						{orders.map((order) => (
-							<TableRow key={order.id}>
-								<TableCell>{order.id}</TableCell>
-								<TableCell>{order.user}</TableCell>
-								<TableCell>{order.product}</TableCell>
-								<TableCell>{order.date}</TableCell>
+						{orders.map((order, index) => (
+							<TableRow key={order?._id}>
+								<TableCell>{index + 1}</TableCell>
+								<TableCell>{order?.user?.username}</TableCell>
+								<TableCell>{order.product?.title}</TableCell>
+								<TableCell>
+									{new Date(order?.createdAt).toDateString()}
+								</TableCell>
 								<TableCell>{order.status}</TableCell>
 								<TableCell>
-									${order.total.toLocaleString()}
+									${order?.amount?.toLocaleString()}
 								</TableCell>
 								<TableCell>
 									<Button asChild size='sm'>
 										<Link
-											href={`/admin/orders/${order.id}`}>
+											href={`/admin/orders/${order?._id}`}>
 											View Details
 										</Link>
 									</Button>

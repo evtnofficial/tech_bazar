@@ -13,6 +13,11 @@ const userModel = new mongoose.Schema(
 			trim: true,
 			lowercase: true,
 		},
+		phone: {
+			type: String,
+			required: true,
+			trim: true,
+		},
 		password: {
 			type: String,
 			required: true,

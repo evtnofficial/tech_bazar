@@ -21,8 +21,8 @@ const orderModel = new mongoose.Schema(
 		status: {
 			type: String,
 			required: true,
-			enum: ["pending", "completed", "failed"],
-			default: "pending",
+			enum: ["Processing", "Completed", "Failed", "Cancelled"],
+			default: "Processing",
 		},
 	},
 	{ timestamps: true }
